@@ -53,7 +53,7 @@ A real number in \[0, 1\] indicates the estimated CVD risk.
 
 We uploaded 4 demos in the `./demo` folder, including one CVD negative case and three CVD positive case. One of the CVD positive subjects died because of CVD in the trial. 
 
-The name of the file indicates its label and the CAC grade evaluated by radiologists.
+The name of the file indicates its label and the CAC grade evaluated by our radiologists.
 
 
 ## Citation
