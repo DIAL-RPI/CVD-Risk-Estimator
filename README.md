@@ -71,6 +71,6 @@ Link to paper:
 
 
 ## License
-Tri2D-Net is a MIT-style licensed, as found in the [LICENSE](LICENSE) file.
-This code is only freely available for free non-commercial use, and may be redistributed under these conditions.
+The source code of Tri2D-Net is licensed under a MIT-style license, as found in the [LICENSE](LICENSE) file.
+This code is only freely available for non-commercial use, and may be redistributed under these conditions.
 For commercial queries, please contact [Dr. Pingkun Yan](https://dial.rpi.edu/people/pingkun-yan).
