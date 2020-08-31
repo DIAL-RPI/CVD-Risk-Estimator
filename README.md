@@ -1,6 +1,6 @@
-# GaitSet
+# Tri2D for CVD Risk Estimation
 
-[3x2DCVD](https://arxiv.org/abs/2008.06997) is the **first** deep learning network trained for directly estimating **overall** cardiovascular disease (CVD) risks on low dose computed tomography (LDCT).
+[Tri2D](https://arxiv.org/abs/2008.06997) is the **first** deep learning network trained for directly estimating **overall** cardiovascular disease (CVD) risks on low dose computed tomography (LDCT).
 
 ## Prerequisites
 
@@ -71,6 +71,6 @@ Link to paper:
 
 
 ## License
-3x2DCVD is a MIT-style licensed, as found in the [LICENSE](LICENSE) file.
+Tri2D is a MIT-style licensed, as found in the [LICENSE](LICENSE) file.
 This code is only freely available for free non-commercial use, and may be redistributed under these conditions.
 For commercial queries, contact [Pingkun Yan](https://dial.rpi.edu/people/pingkun-yan).
