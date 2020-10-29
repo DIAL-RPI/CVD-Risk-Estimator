@@ -2,9 +2,9 @@ import SimpleITK as sitk
 import numpy as np
 from google.colab import files
 
-from bbox_cut import crop_w_bbox
-from heart_detect import detector
-from utils import norm, CT_resize
+from .bbox_cut import crop_w_bbox
+from .heart_detect import detector
+from .utils import norm, CT_resize
 
 
 class Image:

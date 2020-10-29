@@ -1,2 +1,2 @@
-from .init_model import init
 from .image import Image
+from .load_model import load_model

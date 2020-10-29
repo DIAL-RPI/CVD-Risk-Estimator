@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from utils import CT_resize
+from .utils import CT_resize
 
 
 def calibrate_resizer(image, min_point, max_point, new_size):

@@ -10,33 +10,8 @@ from googleapiclient.http import MediaIoBaseDownload
 from google.colab import auth
 from googleapiclient.discovery import build
 
-from model import Model
 
-def init():
-    # Initialize model
-    print('Initializing model...')
-    model_config = {
-        'dout': True,
-        'lr': 1e-4,
-        'num_workers': 8,
-        'batch_size': 32,
-        'restore_iter': 0,
-        'total_iter': 20000,
-        'model_name': 'NLST-CVD3x2D-Res18',
-        'train_source': None,
-        'val_source': None,
-        'test_source': None
-    }
-    model_config['save_name'] = '_'.join([
-        '{}'.format(model_config['model_name']),
-        '{}'.format(model_config['dout']),
-        '{}'.format(model_config['lr']),
-        '{}'.format(model_config['batch_size']),
-    ])
-
-    m = Model(**model_config)
-    
-    # Load model param
+def load_model(m):
     param_name = 'NLST-CVD3x2D-Res18_True_0.0001_32-08000-encoder.ptm'
     if not osp.isfile(param_name):
         print('Please log in Google Drive to download the model parameters.')

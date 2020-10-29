@@ -7,7 +7,7 @@ import os
 
 import numpy as np
 
-from model import Model
+from init_model import init_model
 
 parser = argparse.ArgumentParser(description='Prediction')
 parser.add_argument('--iter', default='8000', type=int,
@@ -17,26 +17,8 @@ parser.add_argument('--path', default='./demos/Positive_CAC_1.npy', type=str,
 opt = parser.parse_args()
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-model_config = {
-    'dout': True,
-    'lr': 1e-4,
-    'num_workers': 8,
-    'batch_size': 32,
-    'restore_iter': 0,
-    'total_iter': 20000,
-    'model_name': 'NLST-CVD3x2D-Res18',
-    'train_source': None,
-    'val_source': None,
-    'test_source': None
-}
-model_config['save_name'] = '_'.join([
-    '{}'.format(model_config['model_name']),
-    '{}'.format(model_config['dout']),
-    '{}'.format(model_config['lr']),
-    '{}'.format(model_config['batch_size']),
-])
 
-m = Model(**model_config)
+m = init_model()
 m.load_model(opt.iter)
 data = np.load(opt.path)
 print('Estimated CVD Risk:', m.aug_transform(data)[1])
