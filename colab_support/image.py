@@ -39,7 +39,7 @@ class Image:
 
     def upload_nifti(self):
         uploaded = files.upload()
-        file_name = uploaded.keys()[0]
+        file_name = list(uploaded.keys())[0]
         self.org_ct_img = sitk.ReadImage(file_name)
 
     def detect_heart(self):
