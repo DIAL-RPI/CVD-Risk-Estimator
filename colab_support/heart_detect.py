@@ -6,6 +6,7 @@ import os.path as osp
 from copy import deepcopy
 
 import io
+import os
 import cv2
 import numpy as np
 import torch
