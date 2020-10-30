@@ -9,6 +9,7 @@ import io
 import cv2
 import numpy as np
 import torch
+import zipfile
 from google.colab import auth
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
@@ -73,12 +74,14 @@ def continue_smooth(bbox_selected):
 
 def load_detector():
     model_name = 'retinanet_heart.pt'
-    if not osp.isfile(model_name):
+    proj_name = 'detector'
+    zip_proj = proj_name + '.zip'
+    if not osp.isfile(zip_proj):
         auth.authenticate_user()
         drive_service = build('drive', 'v3')
 
         print('Downloading the heart detector...')
-        file_id = '1V5gWh4yTphLwW409pKrww_pcvzPQ9ImM'
+        file_id = '1TJ4jnarnt98KygPpuqkGWj9eKQE9-aa7'
         request = drive_service.files().get_media(fileId=file_id)
         param = io.BytesIO()
         downloader = MediaIoBaseDownload(param, request)
@@ -87,11 +90,15 @@ def load_detector():
             status, done = downloader.next_chunk()
 
         param.seek(0)
-        with open(model_name, 'wb') as f:
+        with open(zip_proj, 'wb') as f:
             f.write(param.read())
-
+    with zipfile.ZipFile(zip_proj, 'r') as zip_ref:
+        zip_ref.extractall('./')
     print('Loading the heart detector...')
-    return torch.load(model_name)
+    os.chdir(proj_name)
+    model = torch.load(model_name)
+    os.chdir('../')
+    return model
 
 
 def detector(whole_img):
@@ -110,16 +117,22 @@ def detector(whole_img):
 
         with torch.no_grad():
             scores, classification, transformed_anchors = retinanet(torch_pic)
+            scores = scores.data.cpu().numpy()
+            transformed_anchors = transformed_anchors.data.cpu().numpy()
+            if scores.size == 0:
+                scores = np.asarray([0])
+                transformed_anchors = np.asarray([[0, 0, 0, 0]])
             bbox_id = np.argmax(scores)
             bbox = np.array(transformed_anchors[bbox_id, :])
             bbox_list.append(bbox)
 
             score = scores[bbox_id]
-            if score > 0.95:
+            if score > 0.3:
                 selected = 1
             elif np.sum(bbox_selected) <= 0:
                 selected = 0
-            elif bbox_selected[-1] == 1 and calc_iou(bbox_list[-2], bbox_list[-1]) > 0.8 and score > 0.5:
+            elif bbox_selected[-1] == 1 and calc_iou(
+                    bbox_list[-2], bbox_list[-1]) > 0.8 and score > 0.07:
                 selected = 1
             else:
                 selected = 0
