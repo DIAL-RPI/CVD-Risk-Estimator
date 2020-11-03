@@ -15,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/colab_support/image.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-391">
-              <caret line="55" column="23" selection-start-line="55" selection-start-column="23" selection-end-line="55" selection-end-column="23" />
+            <state relative-caret-position="184">
+              <caret line="34" column="51" selection-start-line="34" selection-start-column="51" selection-end-line="34" selection-end-column="51" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -27,7 +27,9 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/colab_support/heart_detect.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1449" />
+            <state relative-caret-position="1208">
+              <caret line="150" column="42" lean-forward="true" selection-start-line="150" selection-start-column="42" selection-end-line="150" selection-end-column="42" />
+            </state>
           </provider>
         </entry>
       </file>
@@ -51,6 +53,7 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/colab_support/heart_detect.py" />
         <option value="$PROJECT_DIR$/colab_support/image.py" />
       </list>
     </option>
@@ -113,12 +116,12 @@
       <option name="presentableId" value="Default" />
       <updated>1604355889655</updated>
       <workItem from="1604355923655" duration="1025000" />
-      <workItem from="1604364615199" duration="517000" />
+      <workItem from="1604364615199" duration="2240000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1542000" />
+    <option name="totallyTimeSpent" value="3265000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
@@ -164,13 +167,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/colab_support/heart_detect.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1449" />
+        <state relative-caret-position="1208">
+          <caret line="150" column="42" lean-forward="true" selection-start-line="150" selection-start-column="42" selection-end-line="150" selection-end-column="42" />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/colab_support/image.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-391">
-          <caret line="55" column="23" selection-start-line="55" selection-start-column="23" selection-end-line="55" selection-end-column="23" />
+        <state relative-caret-position="184">
+          <caret line="34" column="51" selection-start-line="34" selection-start-column="51" selection-end-line="34" selection-end-column="51" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
