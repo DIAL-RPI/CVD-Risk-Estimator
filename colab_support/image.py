@@ -48,7 +48,7 @@ class Image:
             auth.authenticate_user()
             drive_service = build('drive', 'v3')
 
-            print('Downloading Demo %s...' % demo_id)
+            print('Downloading Demo %s...' % demo_id.strip())
             request = drive_service.files().get_media(fileId=file_id)
             demo = io.BytesIO()
             downloader = MediaIoBaseDownload(demo, request)

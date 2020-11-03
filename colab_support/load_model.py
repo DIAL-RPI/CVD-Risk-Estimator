@@ -14,7 +14,7 @@ from googleapiclient.discovery import build
 def load_model(m):
     param_name = 'NLST-CVD3x2D-Res18_True_0.0001_32-08000-encoder.ptm'
     if not osp.isfile(param_name):
-        print('Please log in Google Drive to download the model parameters.')
+        print('Please login to download the model parameters.')
         auth.authenticate_user()
         drive_service = build('drive', 'v3')
 
