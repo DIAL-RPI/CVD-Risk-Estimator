@@ -277,15 +277,16 @@ class Model:
          ) = grad_cam.get_intermediate_data()
         # axial: d, h, w
         axial_cam = v_2D(axial_output, axial_grad[0])
+        axial_cam = gaussian_filter(axial_cam, sigma=(3, 0, 0))
         # coronal: h, d, w
         coronal_cam = v_2D(coronal_output, coronal_grad[0])
         coronal_cam = np.transpose(coronal_cam, (1, 0, 2))
+        coronal_cam = gaussian_filter(coronal_cam, sigma=(0, 3, 0))
         # sagittal: w, d, h
         sagittal_cam = v_2D(sagittal_output, sagittal_grad[0])
         sagittal_cam = np.transpose(sagittal_cam, (1, 2, 0))
+        sagittal_cam = gaussian_filter(sagittal_cam, sigma=(0, 0, 3))
 
-        coronal_cam = gaussian_filter(coronal_cam, sigma=3)
-        sagittal_cam = gaussian_filter(sagittal_cam, sigma=3)
         cam_combine = axial_cam + coronal_cam + sagittal_cam
         cam_combine = (cam_combine - cam_combine.mean()) / cam_combine.std()
         cam_combine = (cam_combine - cam_combine.min()) / (cam_combine.max() - cam_combine.min() + 1e-9)
