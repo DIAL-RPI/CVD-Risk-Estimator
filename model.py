@@ -287,6 +287,7 @@ class Model:
         coronal_cam = gaussian_filter(coronal_cam, sigma=3)
         sagittal_cam = gaussian_filter(sagittal_cam, sigma=3)
         cam_combine = axial_cam + coronal_cam + sagittal_cam
+        cam_combine = (cam_combine - cam_combine.mean()) / cam_combine.std()
         cam_combine = (cam_combine - cam_combine.min()) / (cam_combine.max() - cam_combine.min() + 1e-9)
 
         _v = volumes.data.numpy()[0]
@@ -298,7 +299,6 @@ class Model:
             org_img = cv2.cvtColor(np.uint8(255 * _v[frame_dix].reshape(128, 128)), cv2.COLOR_GRAY2RGB)
             merged = show_cam_on_image(org_img, cam_combine[frame_dix])
             coupled = np.concatenate([org_img, merged], axis=1)
-            coupled = cv2.resize(coupled, (1024, 512))
             # coupled = cv2.cvtColor(coupled, cv2.COLOR_RGB2BGR)
             grid[i].imshow(coupled)
         plt.show()
