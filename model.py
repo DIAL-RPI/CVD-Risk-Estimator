@@ -263,7 +263,7 @@ class Model:
             return cam
 
         volumes = volumes.unsqueeze(0)
-        grad_cam.module.model.zero_grad()
+        grad_cam.model.zero_grad()
         pred = grad_cam(volumes.cuda())
         one_hot = torch.zeros(pred.size())
         one_hot[:, 1] = 1
@@ -274,7 +274,7 @@ class Model:
         (axial_output, coronal_output, sagittal_output,
          axial_grad, coronal_grad, sagittal_grad,
          f_output
-         ) = grad_cam.module.get_intermediate_data()
+         ) = grad_cam.get_intermediate_data()
         # axial: d, h, w
         axial_cam = v_2D(axial_output, axial_grad[0])
         # coronal: h, d, w
