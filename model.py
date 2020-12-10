@@ -6,17 +6,23 @@ import os.path as osp
 import sys
 from datetime import datetime
 
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data as tordata
+from mpl_toolkits.axes_grid1 import ImageGrid
+from scipy.ndimage import gaussian_filter
 # from apex import amp
 from scipy.special import softmax
+from skimage.transform import resize as imresize
 
 from data import SoftmaxSampler
 from net import Net3x2D
+from visualization import GradCam
 
 
 class Model:
@@ -53,7 +59,7 @@ class Model:
             {'params': encoder.parameters()},
         ], lr=self.lr)
         models = [encoder, ce]
-        #         models, optimizer = amp.initialize(models, optimizer, opt_level="O1")
+        # models, optimizer = amp.initialize(models, optimizer, opt_level="O1")
         self.encoder = nn.DataParallel(models[0])
         self.ce = nn.DataParallel(models[1])
         self.optimizer = optimizer
@@ -222,6 +228,80 @@ class Model:
             pred_prob = softmax(pred.data.cpu().numpy(), axis=1).mean(axis=0)
 
         return pred_prob
+
+    def grad_cam_visual(self, volumes):
+        if isinstance(volumes, np.ndarray):
+            volumes = torch.from_numpy(volumes)
+        self.encoder.eval()
+        grad_cam = GradCam(self.encoder)
+
+        color = cv2.COLORMAP_RAINBOW
+        color_sample = np.asarray(list(range(0, 10)) * 3).reshape(3, 10)
+        color_sample = imresize(color_sample.astype('float'), (12, 128))
+        color_sample = color_sample / 10
+        color_sample = cv2.applyColorMap(np.uint8(255 * color_sample), color)
+        plt.imshow(color_sample)
+        plt.yticks(np.arange(0))
+        plt.xticks(np.arange(-1, 128, 32), [0, 0.25, 0.5, 0.75, 1.0])
+        plt.show()
+
+        def show_cam_on_image(img, mask):
+            img = np.float32(img) / 255
+            heatmap = cv2.applyColorMap(np.uint8(255 * mask), color)
+            heatmap = np.float32(heatmap) / 255
+            cam = heatmap * .5 + np.float32(img) * .5
+            cam = np.clip(cam * 1.1 + 0.15, 0, 1)
+            cam = np.uint8(255 * cam)
+            return cam
+
+        def v_2D(output, grad):
+            weight = grad.mean(dim=(2, 3))
+            s, c = weight.size()
+            cam = F.relu((weight.view(s, c, 1, 1) * output).sum(dim=1))
+            cam = cam.data.cpu().numpy().astype('float')
+            cam = imresize(cam, (128, 128, 128))
+            return cam
+
+        volumes = volumes.unsqueeze(0)
+        grad_cam.module.model.zero_grad()
+        pred = grad_cam(volumes.cuda())
+        one_hot = torch.zeros(pred.size())
+        one_hot[:, 1] = 1
+        one_hot = one_hot.cuda().float()
+        y = (one_hot * pred).sum()
+        y.backward()
+
+        (axial_output, coronal_output, sagittal_output,
+         axial_grad, coronal_grad, sagittal_grad,
+         f_output
+         ) = grad_cam.module.get_intermediate_data()
+        # axial: d, h, w
+        axial_cam = v_2D(axial_output, axial_grad[0])
+        # coronal: h, d, w
+        coronal_cam = v_2D(coronal_output, coronal_grad[0])
+        coronal_cam = np.transpose(coronal_cam, (1, 0, 2))
+        # sagittal: w, d, h
+        sagittal_cam = v_2D(sagittal_output, sagittal_grad[0])
+        sagittal_cam = np.transpose(sagittal_cam, (1, 2, 0))
+
+        coronal_cam = gaussian_filter(coronal_cam, sigma=3)
+        sagittal_cam = gaussian_filter(sagittal_cam, sigma=3)
+        cam_combine = axial_cam + coronal_cam + sagittal_cam
+        cam_combine = (cam_combine - cam_combine.min()) / (cam_combine.max() - cam_combine.min() + 1e-9)
+
+        _v = volumes.data.numpy()[0]
+        total_img_num = _v.shape[0]
+        fig = plt.figure(figsize=(240, 15))
+        grid = ImageGrid(fig, 111, nrows_ncols=(32, 2), axes_pad=0.05)
+        for i in range(64):
+            frame_dix = i * int(total_img_num / 64)
+            org_img = cv2.cvtColor(np.uint8(255 * _v[frame_dix].reshape(128, 128)), cv2.COLOR_GRAY2RGB)
+            merged = show_cam_on_image(org_img, cam_combine[frame_dix])
+            coupled = np.concatenate([org_img, merged], axis=1)
+            coupled = cv2.resize(coupled, (1024, 512))
+            # coupled = cv2.cvtColor(coupled, cv2.COLOR_RGB2BGR)
+            grid[i].imshow(coupled)
+        plt.show()
 
     def save_model(self):
         torch.save(self.encoder.state_dict(), osp.join(
