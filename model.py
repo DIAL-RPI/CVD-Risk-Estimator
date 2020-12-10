@@ -291,7 +291,7 @@ class Model:
 
         _v = volumes.data.numpy()[0]
         total_img_num = _v.shape[0]
-        fig = plt.figure(figsize=(240, 15))
+        fig = plt.figure(figsize=(15, 240))
         grid = ImageGrid(fig, 111, nrows_ncols=(32, 2), axes_pad=0.05)
         for i in range(64):
             frame_dix = i * int(total_img_num / 64)
