@@ -266,7 +266,7 @@ class Model:
         color_sample = imresize(color_sample.astype('float'), (12, 128))
         color_sample = color_sample / 10
         color_sample = cv2.applyColorMap(np.uint8(255 * color_sample), color)
-        color_sample = cv2.cvtColor(color_sample,cv2.COLOR_BGR2RBG)
+        color_sample = cv2.cvtColor(color_sample,cv2.COLOR_BGR2RGB)
         plt.imshow(color_sample)
         plt.yticks(np.arange(0))
         plt.xticks(np.arange(-1, 128, 32), [0, 0.25, 0.5, 0.75, 1.0])
