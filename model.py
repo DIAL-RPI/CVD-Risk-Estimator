@@ -316,7 +316,7 @@ class Model:
         cam_combine = axial_cam + coronal_cam + sagittal_cam
         cam_combine = (cam_combine - cam_combine.min()) / (cam_combine.max() - cam_combine.min() + 1e-9)
 
-        _v = volumes.data.numpy()[0]
+        _v = volumes.data.numpy()[0][0]
         total_img_num = _v.shape[0]
         fig = plt.figure(figsize=(15, 240))
         grid = ImageGrid(fig, 111, nrows_ncols=(32, 2), axes_pad=0.05)
