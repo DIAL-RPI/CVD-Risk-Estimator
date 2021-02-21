@@ -6,12 +6,24 @@
 
 import torch.nn as nn
 
+from net import AttBranch, Branch
+
 
 class GradCam(nn.Module):
     def __init__(self, model):
         super(GradCam, self).__init__()
         self.model = model
         self.model.eval()
+
+        for m in self.model.modules():
+            if isinstance(m, AttBranch):
+                for param in m.parameters():
+                    param.requires_grad = False
+            if isinstance(m, Branch):
+                for _layer in m.backbone2d[:-1]:
+                    for param in _layer.parameters():
+                        param.requires_grad = False
+
         self.regist()
         self.clean()
 
