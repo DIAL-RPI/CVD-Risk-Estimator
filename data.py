@@ -8,6 +8,7 @@ import random
 import numpy as np
 import pandas as pd
 import torch.utils.data as tordata
+from scipy.ndimage import gaussian_filter
 
 
 def load_dataset(datainfo_path, dataset_path, test_groups=[1], validation_groups=[]):
@@ -76,6 +77,11 @@ class DataSet(tordata.Dataset):
         data = self.__loader__(self.data_path[index])
         if self.if_aug:
             data = self.augmentor(data)
+        mask = np.clip(
+            (data > 0.1375).astype('float') * (data < 0.3375).astype('float')
+            + (data > 0.5375).astype('float'), 0, 1)
+        mask = gaussian_filter(mask, sigma=3)
+        data = np.stack([data, data*mask]).astype('float32')
         return data, self.label[index]
 
     def __len__(self):

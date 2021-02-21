@@ -21,7 +21,7 @@ from scipy.special import softmax
 from skimage.transform import resize as imresize
 
 from data import SoftmaxSampler
-from net import Net3x2D
+from net import Tri2DNet, Branch
 from visualization import GradCam
 
 
@@ -38,7 +38,9 @@ class Model:
             model_name,
             train_source,
             val_source,
-            test_source, ):
+            test_source,
+            accumulate_steps,
+            prt_path, ):
 
         self.dout = dout
         self.lr = lr
@@ -51,19 +53,39 @@ class Model:
         self.train_source = train_source
         self.val_source = val_source
         self.test_source = test_source
+        self.accumulate_steps = accumulate_steps
+        self.prt_path = prt_path
 
-        encoder = Net3x2D(dout=self.dout).cuda()
+        encoder = Tri2DNet(dout=self.dout).cuda()
         ce = nn.CrossEntropyLoss(reduction='none').cuda()
 
+        att_id = []
+        aux_id = []
+        for m in encoder.modules():
+            if isinstance(m, Branch):
+                att_id += list(map(id, m.att_branch.parameters()))
+                aux_id += list(map(id, m.aux.parameters()))
+        pretrained_params = filter(
+            lambda p: id(p) not in att_id + aux_id,
+            encoder.parameters())
+        aux_params = filter(
+            lambda p: id(p) in aux_id,
+            encoder.parameters())
+        att_params = filter(
+            lambda p: id(p) in att_id,
+            encoder.parameters())
         optimizer = optim.Adam([
-            {'params': encoder.parameters()},
+            {'params': pretrained_params, 'lr': self.lr / 10},
+            {'params': aux_params, 'lr': self.lr / 5},
+            {'params': att_params, 'lr': self.lr},
         ], lr=self.lr)
+
         models = [encoder, ce]
         # models, optimizer = amp.initialize(models, optimizer, opt_level="O1")
         self.encoder = nn.DataParallel(models[0])
         self.ce = nn.DataParallel(models[1])
         self.optimizer = optimizer
-        self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, [8000, 11000, 14000, 17000], gamma=0.5)
+        # self.scheduler = optim.lr_scheduler.MultiStepLR(self.optimizer, [8000], gamma=0.5)
 
         self.loss = []
         self.m_loss = []
@@ -79,6 +101,7 @@ class Model:
         if self.restore_iter != 0:
             self.load_model()
 
+        self.load_pretrain()
         self.encoder.train()
 
         softmax_sampler = SoftmaxSampler(self.train_source, self.batch_size)
@@ -110,11 +133,14 @@ class Model:
             self.co_loss.append(coronal_ce_loss.cpu().data.numpy())
             self.ax_loss.append(axial_ce_loss.cpu().data.numpy())
 
+            total_loss = total_loss / self.accumulate_steps
             if _total_loss > 1e-9:
                 # with amp.scale_loss(total_loss, self.optimizer) as scaled_loss:
                 #     scaled_loss.backward()
                 total_loss.backward()
+            if self.restore_iter % self.accumulate_steps == 0:
                 self.optimizer.step()
+                self.optimizer.zero_grad()
             self.scheduler.step()
 
             if self.restore_iter % 100 == 0:
@@ -181,7 +207,7 @@ class Model:
                     s = _c[0]
                     h = _c[1]
                     w = _c[2]
-                    _v.append(volumes[:, s:s + 112, h:h + 112, w:w + 112])
+                    _v.append(volumes[:, :, s:s + 112, h:h + 112, w:w + 112])
                 _v = torch.cat(_v, 0).contiguous()
                 (pred, aux_pred_sagittal, aux_pred_coronal,
                  aux_pred_axial) = self.encoder(_v)
@@ -220,7 +246,7 @@ class Model:
                 s = _c[0]
                 h = _c[1]
                 w = _c[2]
-                _v.append(volumes[:, s:s + 112, h:h + 112, w:w + 112])
+                _v.append(volumes[:, :, s:s + 112, h:h + 112, w:w + 112])
             _v = torch.cat(_v, 0).contiguous()
             (pred, aux_pred_sagittal, aux_pred_coronal,
              aux_pred_axial) = self.encoder(_v)
@@ -235,7 +261,7 @@ class Model:
         self.encoder.eval()
         grad_cam = GradCam(self.encoder)
 
-        color = cv2.COLORMAP_RAINBOW
+        color = cv2.COLORMAP_JET
         color_sample = np.asarray(list(range(0, 10)) * 3).reshape(3, 10)
         color_sample = imresize(color_sample.astype('float'), (12, 128))
         color_sample = color_sample / 10
@@ -273,7 +299,6 @@ class Model:
 
         (axial_output, coronal_output, sagittal_output,
          axial_grad, coronal_grad, sagittal_grad,
-         f_output
          ) = grad_cam.get_intermediate_data()
         # axial: d, h, w
         axial_cam = v_2D(axial_output, axial_grad[0])
@@ -284,11 +309,10 @@ class Model:
         coronal_cam = gaussian_filter(coronal_cam, sigma=(0, 3, 0))
         # sagittal: w, d, h
         sagittal_cam = v_2D(sagittal_output, sagittal_grad[0])
-        sagittal_cam = np.transpose(sagittal_cam, (1, 2, 0))
+        sagittal_cam = np.transpose(sagittal_cam, (2, 1, 0))
         sagittal_cam = gaussian_filter(sagittal_cam, sigma=(0, 0, 3))
 
         cam_combine = axial_cam + coronal_cam + sagittal_cam
-        cam_combine = (cam_combine - cam_combine.mean()) / cam_combine.std()
         cam_combine = (cam_combine - cam_combine.min()) / (cam_combine.max() - cam_combine.min() + 1e-9)
 
         _v = volumes.data.numpy()[0]
@@ -297,10 +321,10 @@ class Model:
         grid = ImageGrid(fig, 111, nrows_ncols=(32, 2), axes_pad=0.05)
         for i in range(64):
             frame_dix = i * int(total_img_num / 64)
-            org_img = cv2.cvtColor(np.uint8(255 * _v[frame_dix].reshape(128, 128)), cv2.COLOR_GRAY2RGB)
+            org_img = cv2.cvtColor(np.uint8(255 * _v[frame_dix].reshape(128, 128)), cv2.COLOR_GRAY2BGR)
             merged = show_cam_on_image(org_img, cam_combine[frame_dix])
             coupled = np.concatenate([org_img, merged], axis=1)
-            # coupled = cv2.cvtColor(coupled, cv2.COLOR_RGB2BGR)
+            coupled = cv2.cvtColor(coupled, cv2.COLOR_BGR2RGB)
             grid[i].imshow(coupled)
         plt.show()
 
@@ -323,3 +347,6 @@ class Model:
             '{}-{:0>5}-optimizer.ptm'.format(self.save_name, restore_iter))
         if osp.isfile(opt_path):
             self.optimizer.load_state_dict(torch.load(opt_path))
+
+    def load_pretrain(self):
+        self.encoder.load_state_dict(torch.load(self.prt_path), False)

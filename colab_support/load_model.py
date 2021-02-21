@@ -12,14 +12,14 @@ from googleapiclient.discovery import build
 
 
 def load_model(m):
-    param_name = 'NLST-CVD3x2D-Res18_True_0.0001_32-08000-encoder.ptm'
+    param_name = 'NLST-Tri2DNet_True_0.0001_16-00700-encoder.ptm'
     if not osp.isfile(param_name):
         print('Please login to download the model parameters.')
         auth.authenticate_user()
         drive_service = build('drive', 'v3')
 
         print('Downloading the model parameters...')
-        file_id = '1jrPgZs2eHP3CFJZDV6U6bNw4dHSmeFk8'
+        file_id = '1H2PFQ_PxXa5ryKmwNivvwGR-hZf5yyGJ'
         request = drive_service.files().get_media(fileId=file_id)
         param = io.BytesIO()
         downloader = MediaIoBaseDownload(param, request)

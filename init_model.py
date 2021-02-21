@@ -6,11 +6,13 @@ def init_model():
     model_config = {
         'dout': True,
         'lr': 1e-4,
-        'num_workers': 8,
-        'batch_size': 32,
+        'num_workers': 32,
+        'batch_size': 16,
         'restore_iter': 0,
-        'total_iter': 20000,
-        'model_name': 'NLST-CVD3x2D-Res18',
+        'total_iter': 1000,
+        'model_name': 'NLST-Tri2DNet',
+        'prt_path': 'NLST-Tri2DNetpretrain_True_0.0001_32-08200-encoder.ptm',
+        'accumulate_steps': 2,
         'train_source': None,
         'val_source': None,
         'test_source': None

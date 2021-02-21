@@ -1,15 +1,16 @@
 import io
-import SimpleITK as sitk
-import numpy as np
 import os.path as osp
 
+import SimpleITK as sitk
 import matplotlib.pyplot as plt
+import numpy as np
 from mpl_toolkits.axes_grid1 import ImageGrid
+from scipy.ndimage import gaussian_filter
 
-from google.colab import files
-from googleapiclient.http import MediaIoBaseDownload
 from google.colab import auth
+from google.colab import files
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
 
 from .bbox_cut import crop_w_bbox
 from .heart_detect import detector
@@ -38,7 +39,7 @@ class Image:
             '5': '1sk9OSZDaC6upl_uDmPVRLy5e14bHd1ir',
             '6': '1o-NiPKDUkOqiKO7wyY4DyRUER-teCpnw',
             '7': '17gmhysd9uDYyMkNqkPlPPiI4XtokV2be',
-            '8': '104pDbWRt3zd33778qmOrNHLErt89CY2F',}
+            '8': '104pDbWRt3zd33778qmOrNHLErt89CY2F', }
         if demo_id not in file_id_dict:
             print('Sorry we do not have a demo with ID', demo_id)
             return
@@ -108,10 +109,19 @@ class Image:
         self.detected_npy = sitk.GetArrayFromImage(self.detected_ct_img)
         self.detected_npy = norm(self.detected_npy, -300, 500)
 
-    def visualization(self):
+    def detect_visual(self):
         total_img_num = len(self.visual_bbox)
         fig = plt.figure(figsize=(15, 15))
         grid = ImageGrid(fig, 111, nrows_ncols=(8, 8), axes_pad=0.05)
         for i in range(64):
             grid[i].imshow(self.visual_bbox[i * int(total_img_num / 64)])
         plt.show()
+
+    def to_network_input(self):
+        data = self.detected_npy
+        mask = np.clip(
+            (data > 0.1375).astype('float') * (data < 0.3375).astype('float')
+            + (data > 0.5375).astype('float'), 0, 1)
+        mask = gaussian_filter(mask, sigma=3)
+        network_input = np.stack([data, data * mask]).astype('float32')
+        return network_input

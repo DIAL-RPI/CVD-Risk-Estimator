@@ -31,7 +31,6 @@ class GradCam(nn.Module):
         self.model.module.branch_coronal.backbone2d.register_forward_hook(self.save_coronal_output)
         self.model.module.branch_sagittal.backbone2d.register_backward_hook(self.save_sagittal_grad)
         self.model.module.branch_sagittal.backbone2d.register_forward_hook(self.save_sagittal_output)
-        self.model.module.fc_fuse.register_forward_hook(self.save_f_output)
 
     def save_axial_grad(self, model, grad_input, grad_output):
         self.axial_grad = grad_output
@@ -51,14 +50,10 @@ class GradCam(nn.Module):
     def save_sagittal_output(self, model, input, output):
         self.sagittal_output = output
 
-    def save_f_output(self, model, input, output):
-        self.f_output = input
-
     def forward(self, input):
         self.clean()
         return self.model(input)[0]
 
     def get_intermediate_data(self):
         return (self.axial_output, self.coronal_output, self.sagittal_output,
-                self.axial_grad, self.coronal_grad, self.sagittal_grad,
-                self.f_output)
+                self.axial_grad, self.coronal_grad, self.sagittal_grad)

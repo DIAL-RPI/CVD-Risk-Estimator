@@ -30,7 +30,8 @@ This model was trained on the [National Lung Screening Trial (NLST)](https://bio
 
 **BEFORE RUNNING THE CODE, PLEASE DOWNLOAD THE NETWORK CHECKPOINT FIRST.**
 
-The trained model can be downloaded through [this link](https://1drv.ms/u/s!AurT2TsSKdxQvSOmj5kBiVhfKuDT?e=5oLMka). Please download the checkpoint to the `./checkpoint` folder.
+The trained model can be downloaded through [this link](https://1drv.ms/u/s!AurT2TsSKdxQvz1aHvmxTlkDNkTz?e=8rCnJl). Please download the checkpoint to the `./checkpoint` folder.
+
 
 ### CVD Risk Prediction
 
