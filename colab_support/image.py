@@ -33,7 +33,7 @@ class Image:
         demo_id = str(demo_id)
         file_id_dict = {
             '1': '1DlW6NYvJYkZ_wMw4tgk_VfY2M-Yu1A5l',
-            '2': '1PSlV3U7lZxBkjGLnFI9rvXwjSKIcSSAa',
+            '2': '1p-gDuPjXkA3j1kJXif81UmUXwji8vVkH',
             '3': '1nj8Vy-S-Kg-szinkNCiRl0zUWQXdDoUU',
             '4': '1w0hz_8vzeeYn78eLLsYT-9fCDx2mtCw4',
             '5': '1sk9OSZDaC6upl_uDmPVRLy5e14bHd1ir',
