@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/256093026.svg)](https://zenodo.org/badge/latestdoi/256093026)
 
-[Tri2D-Net](https://arxiv.org/abs/2008.06997) is the **first** deep learning network trained for directly estimating **overall** cardiovascular disease (CVD) risks on low dose computed tomography (LDCT).
+Tri2D-Net is the **first** deep learning network trained for directly estimating **overall** cardiovascular disease (CVD) risks on low dose computed tomography (LDCT). The corresponding [paper](https://www.nature.com/articles/s41467-021-23235-4) has been published on Nature Communications.
 
 ## Prerequisites
 
@@ -62,15 +62,19 @@ The name of the file indicates its label and the CAC grade evaluated by our radi
 ## Citation
 Please cite these papers in your publications if the code helps your research:
 ```
-@article{chao2020deep,
-  title={Deep Learning Predicts Cardiovascular Disease Risks from Lung Cancer Screening Low Dose Computed Tomography},
-  author={Chao, Hanqing and Shan, Hongming and Homayounieh, Fatemeh and Singh, Ramandeep and Khera, Ruhani Doda and Guo, Hengtao and Su, Timothy and Wang, Ge and Kalra, Mannudeep K and Yan, Pingkun},
-  journal={arXiv preprint arXiv:2008.06997},
-  year={2020}
+@Article{chao2021deep,
+  author  = {Chao, Hanqing and Shan, Hongming and Homayounieh, Fatemeh and Singh, Ramandeep and Khera, Ruhani Doda and Guo, Hengtao and Su, Timothy and Wang, Ge and Kalra, Mannudeep K. and Yan, Pingkun},
+  title   = {Deep learning predicts cardiovascular disease risks from lung cancer screening low dose computed tomography},
+  journal = {Nature Communications},
+  year    = {2021},
+  volume  = {12},
+  number  = {1},
+  pages   = {2963},
+  url     = {https://doi.org/10.1038/s41467-021-23235-4},
 }
 ```
 Link to paper:
-- [Deep Learning Predicts Cardiovascular Disease Risks from Lung Cancer Screening Low Dose Computed Tomography](https://arxiv.org/abs/2008.06997)
+- [Deep Learning Predicts Cardiovascular Disease Risks from Lung Cancer Screening Low Dose Computed Tomography](https://www.nature.com/articles/s41467-021-23235-4)
 
 
 ## License
