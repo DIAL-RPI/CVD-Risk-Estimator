@@ -22,7 +22,7 @@ Noted that our code is tested based on [PyTorch 1.4](https://pytorch.org/get-sta
 
 ### Data 
 #### Availability
-This model was trained on the [National Lung Screening Trial (NLST)](https://biometry.nci.nih.gov/cdas/learn/nlst/images/) dataset. The NLST is made publicly available by the National Cancer Institute.
+This model was trained on the [National Lung Screening Trial (NLST)](https://biometry.nci.nih.gov/cdas/learn/nlst/images/) dataset. The NLST is made publicly available by the National Cancer Institute. The detailed data information and the split of the NLST dataset used in the paper is contained in [NLST_data_split.csv](NLST_data_split.csv).
 
 #### Preprocess
 - **Heart Detection**: [RetinaNet](https://github.com/yhenon/pytorch-retinanet) was used in our study for heart detection.
